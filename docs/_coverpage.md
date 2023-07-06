@@ -2,13 +2,13 @@
 
 ![logo](_media/favicon-128.svg)
 
-# docsify <small>3.5</small>
+# docsNote <small>1.0</small>
 
-> 一个神奇的文档网站生成器。
+> 个人学习笔记。
 
-- 简单、轻便 (压缩后 ~21kB)
-- 无需生成 html 文件
-- 众多主题
+- 采用 docsify 文档生成器
+- 部署于 GithubPages
 
-[GitHub](https://github.com/docsifyjs/docsify/)
+
+[GitHub](https://github.com/JermainLiu/docsNote)
 [Get Started](README.md)

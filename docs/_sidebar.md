@@ -1,1 +1,1 @@
-- [语义分割](1_语义分割/)
+- [语义分割](1_Semantic_Segmentation/)
