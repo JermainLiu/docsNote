@@ -62,7 +62,7 @@ labelme -h
 labelme
 ```
 
-<img src="https://cdn.jsdelivr.net/gh/jermainn/imgpic@master/note_img/labelUI.png" alt="labelUI" style="zoom:80%;" />
+<img src="https://cdn.jsdelivr.net/gh/jermainn/imgpic@master/note_img/labelUI.png" alt="labelUI" style="zoom:67%;" />
 
 点击保存后，会生成 `.json` 文件
 
@@ -72,7 +72,7 @@ labelme
 labelme_draw_json 文件名.json
 ```
 
-<img src="https://cdn.jsdelivr.net/gh/jermainn/imgpic@master/note_img/jsonLabeled.webp" alt="jsonLabeled" style="zoom:80%;" />
+<img src="https://cdn.jsdelivr.net/gh/jermainn/imgpic@master/note_img/jsonLabeled.webp" alt="jsonLabeled"  />
 
 将标注的 `.json` 文件转化为 `.png` 图片文件（单个）
 
@@ -142,4 +142,52 @@ data_annotated_voc
 需要用到 `Matlab` 的 `imageLabeler` 工具进行标注
 
 该工具位于 `Computer Vision Toolbox` (计算机视觉工具箱) 中
+
+### 使用
+
+直接在命令窗口输入 `imageLabeler` ，或者在 matlab 的菜单栏点击 `app` 下打开
+
+<img src="https://cdn.jsdelivr.net/gh/jermainn/imgpic@master/note_img/imageLabeler.webp" alt="imageLabeler" style="zoom: 50%;" />
+
+工具界面
+
+<img src="https://cdn.jsdelivr.net/gh/jermainn/imgpic@master/note_img/imageLabelerUI1.webp" alt="imageLabelerUI1" style="zoom:70%;" />
+
+图像标注
+
+<img src="https://cdn.jsdelivr.net/gh/jermainn/imgpic@master/note_img/imageLabelerUI2.webp" alt="imageLabelerUI2" style="zoom:70%;" />
+
+> [!TIP]
+>
+> 在工具栏中，有智能标注、笔刷等选择
+
+文件保存
+
+<img src="https://cdn.jsdelivr.net/gh/jermainn/imgpic@master/note_img/imageLabelerUI3.webp" alt="imageLabelerUI3" style="zoom:70%;" />
+
+> 保存标注结果，或者保存(save) 会话(session)
+>
+> 标注结果为 png 图像
+
+---
+
+
+
+## 3 数据读取
+
+```python
+import numpy as np
+from PIL import Image
+
+img = Image.open("./data_annotated_voc/JPEGImages/03.jpg").convert('RGB')
+lbl = Image.open("./data_annotated_voc/SegmentationClassPNG/03.png")
+
+# resize
+img = img.resize([500, 375], Image.BICUBIC)
+lbl = img.resize([500, 375], Image.BICUBIC)
+
+# 
+img = np.asarray(img, np.float32)
+lbl = np.asarray(lbl, np.float32)
+```
 
