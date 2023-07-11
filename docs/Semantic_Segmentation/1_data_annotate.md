@@ -191,3 +191,12 @@ img = np.asarray(img, np.float32)
 lbl = np.asarray(lbl, np.float32)
 ```
 
+---
+
+
+
+## 4 继续学习
+
+- 标注数据集的格式：voc、coco、yolo 等
+- 由 `.json` 文件到 `.png` 文件的转换实现
+- 复杂数据集的批量数据读取
