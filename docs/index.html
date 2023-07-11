@@ -73,7 +73,11 @@
       // 块引用转化
       'flexible-alerts': {
         style: 'callout'
-      }
+      },
+      latex: {
+        inlineMath   : [['$', '$'], ['\\(', '\\)']], // default
+        displayMath  : [['$$', '$$']],               // default
+      },
     }
   </script>
 
@@ -98,6 +102,12 @@
   <script src="https://unpkg.com/docsify-plugin-flexible-alerts"></script>
   <!-- 图片缩放 -->
   <!-- <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/zoom-image.min.js"></script> -->
+
+  <!-- 公式渲染 https://scruel.github.io/docsify-latex/#/ -->
+  <!-- LaTeX display engine -->
+  <script src="//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <!--  docsify-latex plugin -->
+  <script src="//cdn.jsdelivr.net/npm/docsify-latex@0"></script>
 
 </body>
 </html>
