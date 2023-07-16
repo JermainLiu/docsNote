@@ -454,5 +454,151 @@ if __name__ == "__main__":
 
 ## 4 模型训练
 
+### 加载数据集
+
+```python
+train_loader = CreateTrainDataLoader(args)
+```
+
+通过 `torch.utils.data.DataLoader` 进行数据的加载
+
+```python
+def CreateTrainDataLoader(args):
+    isbi_dataset = IsbiDataSet(args.data_dir)
+
+    train_dataset = data.DataLoader(dataset=isbi_dataset,
+                                    batch_size=args.batch_size,
+                                    shuffle=True)
+    return train_dataset
+```
+
+### 模型加载
+
+```python
+model, optimizer = CreateModel(args)
+```
+
+这里我将模型与优化器写入到了一个类中，所以训练和测试的时候稍有不同，测试时不用加载优化器
+
+> [!ATTENTION]
+>
+> 使用了 `RMSProp` 优化算法
+
+同时，加入模型加载位置参数，如此实现测试时的模型加载以及训练时间的继续训练
+
+```python
+def CreateModel(args):
+    model = UNet(n_channels=args.n_channels, num_classes=args.num_classes, bilinear=args.bilinear, phase=args.set)
+    if args.restore_from is not None:
+        model.load_state_dict(torch.load(args.restore_from, map_location=lambda storage, loc: storage))
+    if args.set == "train":
+        optimizer = optim.RMSprop(
+            model.parameters(),
+            lr=args.learning_rate,
+            weight_decay=args.weight_decay,
+            momentum=args.momentum)
+        optimizer.zero_grad()
+        return model, optimizer
+    else:
+        return model
+```
+
+开启 `cuda` 加速
+
+```python
+cudnn.enabled = True
+cudnn.benchmark = True
+model.train()
+model.cuda()
+# 这里也可以使用 model.to(device='cuda')
+```
+
+### 模型训练
+
+```python
+for epoch in range(start_epoch, args.epochs):
+    # 按照 batch_size 开始训练
+    for image, label in train_loader:
+        optimizer.zero_grad()
+        # 将数据拷贝到 device 中
+        image, label = Variable(image).cuda(), Variable(label).cuda()
+        # image, label = image.to(device='cuda', dtype=torch.float32), label.to(device='cuda', dtype=torch.float32)
+        # image, label = Variable(image), Variable(label)
+
+        # 预测结果
+        pred = model(image, lbl=label)
+        # 计算loss
+        loss = model.loss
+        loss.backward()
+        optimizer.step()
+```
+
+> [!NOTE]
+>
+> 如果使用 `cuda` 训练模型，需要将数据集放到 `cuda` 上后载入到网络中
+>
+> 损失函数使用了 `torch.nn.BCEWithLogitsLoss()` ，这种损失将 `Sigmoid` 层和 `BCELoss` 组合在一个类中，比使用简单的两步在数值上更加稳定，使用到了 `log-sum-exp` 技巧实现数值的稳定性
+>
+> 这里可以再深入一点
+
+### 模型保存
+
+```python
+if not (epoch+1) % args.save_pred_epoch:
+    print("taking snapshot ...")
+    torch.save(model.state_dict(), os.path.join(args.snapshot_dir, '%s_' %(model_name) + str(epoch+1) + '.pth'))
+```
+
+通过 `torch.save` 将模型保存为 `.pth` 文件
+
+在创建模型的时候对上一次的保存结果进行导入并继续进行训练
+
+### 数据可视化
+
+使用到了 `tensorboardX` 或者 `tensorboard` 模块
+
+```python
+import tensorboardX
+
+def main():
+    ...
+    	# 省略数据与模型加载程序
+    ...
+    
+    # 创建一个实例
+    train_writer = tensorboardX.SummaryWriter(
+        os.path.join(args.snapshot_dir, "logs", model_name)
+    )
+    idx = 0
+    for epoch in range(start_epoch, args.epochs):
+        for image, label in train_loader:
+            ...
+                # 省略训练过程程序
+            ...
+            # 在每个 batch 训练后进行一次记录
+            train_writer.add_scalar('loss', loss, idx+1)
+            print('[items %d][loss %.4f][lr %.6f]'
+                  % (idx + 1, loss.item(), optimizer.param_groups[0]['lr']))
+            idx += 1
+```
+
+然后在 `conda` 环境的命令行中打开 `tensorboard` 可视化显示
+
+```bash
+tensorboard --logdir=path_to_logs
+```
+
+> [!NOTE]
+>
+> 进一步使用 `.add_image` 方法对训练过程中的预测结果进行可视化更新
+>
+> 待添加……
+
+---
+
+
+
+## 5 模型测试
+
 进行中……
 
